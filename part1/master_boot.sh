@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Dependencies
 sudo apk add ufw
 
