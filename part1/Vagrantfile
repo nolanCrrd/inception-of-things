@@ -1,28 +1,16 @@
 require 'rbconfig'
 
-host_arch = RbConfig::CONFIG['host_cpu']
-
 Vagrant.configure(2) do |config|
   config.vm.box = "generic/alpine318"
   
   config.vm.provider "libvirt" do |lv|
     lv.memory = 512
     lv.cpus = 1
-    lv.driver = 'qemu'
+    lv.driver = 'kvm'
     lv.features = ['apic']
-    
-    if host_arch =~ /aarch64|arm64/
-      	lv.machine_type = "virt"
-      	lv.usb_controller :model => "qemu-xhci"
-      	lv.input :type => "keyboard", :bus => "usb"
-      	lv.input :type => "mouse", :bus => "usb"
-      	lv.cpu_mode = "custom"
-      	lv.cpu_model = "cortex-a72"
-    else
-      	lv.machine_type = "q35"
-      	lv.cpu_mode = "custom"
-      	lv.cpu_model = "qemu64"
-    end
+    lv.machine_type = "q35"
+    lv.cpu_mode = "custom"
+    lv.cpu_model = "qemu64"
   end
   
   config.vm.define "ndelhotaS" do |control|
