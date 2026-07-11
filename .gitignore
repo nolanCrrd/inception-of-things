@@ -4,3 +4,4 @@
 #vagrant related
 .vagrant
 *.log
+*.swp
