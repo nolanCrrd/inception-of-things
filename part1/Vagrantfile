@@ -13,6 +13,7 @@ Vagrant.configure(2) do |config|
     lv.cpu_model = "qemu64"
   end
   
+  # SERVER
   config.vm.define "ndelhotaS" do |control|
     control.vm.hostname = "ndelhotaS"
     control.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
@@ -21,9 +22,12 @@ Vagrant.configure(2) do |config|
     end
   config.vm.provision :shell, :inline => SHELL
     SHELL
-    control.vm.provision "shell", path: "./worker_boot.sh"
+    control.vm.provision "shell", path: "./worker_boot.sh", env: {
+      "K3S_TOKEN" => ENV['K3S_TOKEN'] 
+    }
   end
   
+  # WORKER
   config.vm.define "ndelhotaSW" do |control|
     control.vm.hostname = "ndelhotaSW"
     control.vm.network "private_network", ip:  ENV['K3S_AGENT_IP']
@@ -32,6 +36,8 @@ Vagrant.configure(2) do |config|
     end
     config.vm.provision "shell", inline: <<-SHELL
       SHELL
-      control.vm.provision "shell", path: "./agent_boot.sh"
+      control.vm.provision "shell", path: "./agent_boot.sh", env: {
+        "K3S_SERVER_IP" => ENV['K3S_SERVER_IP'], "K3S_TOKEN" => ENV['K3S_TOKEN'] 
+      }
     end
 end
