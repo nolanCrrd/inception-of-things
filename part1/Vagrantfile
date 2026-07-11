@@ -15,7 +15,7 @@ Vagrant.configure(2) do |config|
   
   config.vm.define "ndelhotaS" do |control|
     control.vm.hostname = "ndelhotaS"
-    control.vm.network "private_network", ip: "192.168.56.110"
+    control.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
     control.vm.provider "libvirt" do |lv|
       #lv.customize ["modifyvm", :id, "--name", "ndelhotaS"]
     end
@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
   
   config.vm.define "ndelhotaSW" do |control|
     control.vm.hostname = "ndelhotaSW"
-    control.vm.network "private_network", ip: "192.168.56.111"
+    control.vm.network "private_network", ip:  ENV['K3S_AGENT_IP']
     control.vm.provider "libvirt" do |lv|
       #lv.customize ["modifyvm", :id, "--name", "ndelhotaSW"]
     end
