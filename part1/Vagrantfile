@@ -1,8 +1,14 @@
-require 'rbconfig'
-
+if File.exist?('.env')
+  File.foreach('.env') do |line|
+    next if line.strip.empty? || line.start_with?('#')
+    key, value = line.strip.split('=', 2)
+    ENV[key] = value if key && value
+  end
+end
+ 
 Vagrant.configure(2) do |config|
+
   config.vm.box = "generic/alpine318"
-  
   config.vm.provider "libvirt" do |lv|
     lv.memory = 512
     lv.cpus = 1
@@ -17,26 +23,19 @@ Vagrant.configure(2) do |config|
   config.vm.define "ndelhotaS" do |control|
     control.vm.hostname = "ndelhotaS"
     control.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
-    control.vm.provider "libvirt" do |lv|
-      #lv.customize ["modifyvm", :id, "--name", "ndelhotaS"]
-    end
-  config.vm.provision :shell, :inline => SHELL
-    SHELL
-    control.vm.provision "shell", path: "./worker_boot.sh", env: {
+    control.vm.provision "shell", path: "./master_boot.sh", env: {
       "K3S_TOKEN" => ENV['K3S_TOKEN'] 
     }
+    control.vm.provider "libvirt" do |lv|
+      lv.memory = 1024
+    end
   end
   
   # WORKER
   config.vm.define "ndelhotaSW" do |control|
     control.vm.hostname = "ndelhotaSW"
     control.vm.network "private_network", ip:  ENV['K3S_AGENT_IP']
-    control.vm.provider "libvirt" do |lv|
-      #lv.customize ["modifyvm", :id, "--name", "ndelhotaSW"]
-    end
-    config.vm.provision "shell", inline: <<-SHELL
-      SHELL
-      control.vm.provision "shell", path: "./agent_boot.sh", env: {
+      control.vm.provision "shell", path: "./worker_boot.sh", env: {
         "K3S_SERVER_IP" => ENV['K3S_SERVER_IP'], "K3S_TOKEN" => ENV['K3S_TOKEN'] 
       }
     end
