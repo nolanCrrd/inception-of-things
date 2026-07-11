@@ -10,6 +10,7 @@ ufw allow from 192.168.56.0/24
 ufw allow from 10.42.0.0/16
 ufw allow from 10.43.0.0/16
 ufw --force enable
+rc-update add ufw
 
 # K3S
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server \
