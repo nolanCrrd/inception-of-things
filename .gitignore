@@ -1,0 +1,6 @@
+#security
+.env
+
+#vagrant related
+.vagrant
+*.log
