@@ -23,6 +23,21 @@ Vagrant.configure(2) do |config|
   config.vm.define "ndelhotaS" do |control|
     control.vm.hostname = "ndelhotaS"
     control.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
+    config.vm.provision "shell", inline: <<-SHELL
+    echo "=== ETAPE 1 : Configuration des cgroups v2 ==="
+    apk add --no-cache cgroup-tools coreutils curl
+
+    # Configurer OpenRC pour le mode unified (cgroups v2)
+    sed -i 's/#rc_cgroup_mode="hybrid"/rc_cgroup_mode="unified"/' /etc/conf.d/cgroups 2>/dev/null || sed -i 's/#rc_cgroup_mode="hybrid"/rc_cgroup_mode="unified"/' /etc/rc.conf
+    rc-update add cgroups boot
+
+    # Injecter l'option dans le bootloader
+    if ! grep -q "cgroup_no_v1=all" /etc/update-extlinux.conf; then
+        sed -i 's/default_kernel_opts="/default_kernel_opts="cgroup_no_v1=all /' /etc/update-extlinux.conf
+        update-extlinux
+    fi
+  SHELL
+  config.vm.provision :reload
     control.vm.provision "shell", path: "./master_boot.sh", env: {
       "K3S_TOKEN" => ENV['K3S_TOKEN'] , "K3S_SERVER_IP" => ENV["K3S_SERVER_IP"]
     }
