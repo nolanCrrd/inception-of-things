@@ -1,5 +1,5 @@
 #Machine user
-USER=ndelhota
+USER=ncorrear
 #Domain name
 SERVER_DOMAIN=part1_ndelhotaS
 AGENT_DOMAIN=part1_ndelhotaSW
@@ -43,9 +43,9 @@ erase_domain: root_check
 	virsh undefine $(AGENT_DOMAIN); \
     	vagrant destroy	
 
-restaure crash: root_check
+restore crash: root_check
 	vagrant plugin install vagrant-reload reload ;\
-	erase_domain ; \
+	make erase_domain ; \
 	chown -R $(USER):$(USER) .vagrant
 
 help:
