@@ -41,10 +41,12 @@ erase_domain: root_check
 	virsh undefine $(SERVER_DOMAIN); \
 	virsh destroy $(AGENT_DOMAIN); \
 	virsh undefine $(AGENT_DOMAIN); \
-       	vagrant destroy	
+    	vagrant destroy	
 
-restaure crash: root_check erase_domain
-	@chown -R $(USER):$(USER) .vagrant
+restaure crash: root_check
+	vagrant plugin install vagrant-reload reload ;\
+	erase_domain ; \
+	chown -R $(USER):$(USER) .vagrant
 
 help:
 	@echo "sudo virsh list --all :list all current domain"; \
