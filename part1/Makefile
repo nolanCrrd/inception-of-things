@@ -1,3 +1,5 @@
+#Machine user
+USER=ndelhota
 #Domain name
 SERVER_DOMAIN=part1_ndelhotaS
 AGENT_DOMAIN=part1_ndelhotaSW
@@ -40,6 +42,9 @@ erase_domain: root_check
 	virsh destroy $(AGENT_DOMAIN); \
 	virsh undefine $(AGENT_DOMAIN); \
        	vagrant destroy	
+
+restaure crash: root_check erase_domain
+	@chown -R $(USER):$(USER) .vagrant
 
 help:
 	@echo "sudo virsh list --all :list all current domain"; \
