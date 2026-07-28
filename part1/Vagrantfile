@@ -5,23 +5,14 @@ if File.exist?('.env')
     ENV[key] = value if key && value
   end
 end
- 
-Vagrant.configure(2) do |config|
-  required_plugins = %w( vagrant-reload )
-  required_plugins.each do |plugin|
-    unless Vagrant.has_plugin?(plugin)
-      system("vagrant plugin install #{plugin}")
-    end
-  end
 
+Vagrant.configure(2) do |config|
   config.vm.box = "generic/alpine318"
   config.vm.provider "libvirt" do |lv|
     lv.memory = 512
     lv.cpus = 1
-    lv.driver = 'kvm'
-    lv.cpu_mode = "host-passthrough"
   end
-
+  
   config.vm.provision "shell", inline: <<-SHELL
     echo "=== configuring c2 instead of default c1 alpine"
     apk add --no-cache cgroup-tools coreutils curl
@@ -32,27 +23,26 @@ Vagrant.configure(2) do |config|
         update-extlinux
     fi
   SHELL
-  config.vm.provision :reload
-  
-  # SERVER
-  config.vm.define "ndelhotaS" do |master_control|
-    master_control.vm.hostname = "ndelhotaS"
-    master_control.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
-    master_control.vm.provision "shell", path: "./master_boot.sh", env: {
+
+  # Master/Server
+  config.vm.define ENV['K3S_SERVER_NAME'] do |master|
+    master.vm.hostname = ENV['K3S_SERVER_NAME']
+    master.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
+    master.vm.provision "shell", path: "./master_boot.sh", env: {
       "K3S_TOKEN" => ENV['K3S_TOKEN'] , "K3S_SERVER_IP" => ENV["K3S_SERVER_IP"]
     }
-    master_control.vm.provider "libvirt" do |lv|
+    master.vm.provider "libvirt" do |lv| 
       lv.memory = 1024
       lv.cpus = 2
     end
   end
-  
-  # WORKER
-  config.vm.define "ndelhotaSW" do |worker_control|
-    worker_control.vm.hostname = "ndelhotaSW"
-    worker_control.vm.network "private_network", ip:  ENV['K3S_AGENT_IP']
-    worker_control.vm.provision "shell", path: "./worker_boot.sh", env: {
+  # Worker
+  config.vm.define ENV['K3S_AGENT_NAME'] do |worker|
+    worker.vm.hostname = ENV['K3S_AGENT_NAME']
+    worker.vm.network "private_network", ip: ENV['K3S_AGENT_IP']
+    worker.vm.provision "shell", path: "./worker_boot.sh", env: {
         "K3S_SERVER_IP" => ENV['K3S_SERVER_IP'], "K3S_TOKEN" => ENV['K3S_TOKEN'], "K3S_AGENT_IP" => ENV['K3S_AGENT_IP']
       }
-    end
+
+  end
 end

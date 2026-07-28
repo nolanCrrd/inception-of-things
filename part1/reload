@@ -1,0 +1,8 @@
+  #plugin management
+  required_plugins = %w( reload )
+  required_plugins.each do |plugin|
+    unless Vagrant.has_plugin?(plugin)
+      system("vagrant plugin install #{plugin}")
+    end
+  end
+
