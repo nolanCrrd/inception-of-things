@@ -1,0 +1,39 @@
+if File.exist?('.env')
+  File.foreach('.env') do |line|
+    next if line.strip.empty? || line.start_with?('#')
+    key, value = line.strip.split('=', 2)
+    ENV[key] = value if key && value
+  end
+end
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "generic/alpine318"
+  config.vm.provider "libvirt" do |lv|
+    lv.memory = 512
+    lv.cpus = 1
+  end
+  
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "=== configuring c2 instead of default c1 alpine"
+    apk add --no-cache cgroup-tools coreutils curl
+    sed -i 's/#rc_cgroup_mode="hybrid"/rc_cgroup_mode="unified"/' /etc/conf.d/cgroups 2>/dev/null || sed -i 's/#rc_cgroup_mode="hybrid"/rc_cgroup_mode="unified"/' /etc/rc.conf
+    rc-update add cgroups boot
+    if ! grep -q "cgroup_no_v1=all" /etc/update-extlinux.conf; then
+        sed -i 's/default_kernel_opts="/default_kernel_opts="cgroup_no_v1=all /' /etc/update-extlinux.conf
+        update-extlinux
+    fi
+  SHELL
+
+  # Master/Server
+  config.vm.define ENV['K3S_SERVER_NAME'] do |master|
+    master.vm.hostname = ENV['K3S_SERVER_NAME']
+    master.vm.network "private_network", ip: ENV['K3S_SERVER_IP']
+    master.vm.provision "shell", path: "./master_boot.sh", env: {
+      "K3S_TOKEN" => ENV['K3S_TOKEN'] , "K3S_SERVER_IP" => ENV["K3S_SERVER_IP"]
+    }
+    master.vm.provider "libvirt" do |lv| 
+      lv.memory = 1024
+      lv.cpus = 2
+    end
+  end
+end
