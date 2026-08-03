@@ -1,0 +1,40 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-one-deploy
+  labels:
+    app: app-one
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-one   # used to watch Service lifecycle
+  template:
+    metadata:
+      labels:
+        app: app-one # must match with matchlabels
+    spec:
+      containers:
+        - name: app-one-container
+          image: paulbouwer/hello-kubernetes:1.10
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: MESSAGE
+              value: "Currently saluting from app one"
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-one
+spec:
+  selector:
+    app: app-one     # use by deployment to orchestrate life cycle
+  ports:
+    - port: 80 #ingress will contact http://appx:80
+      targetPort: 8080 # requer is transfered to pod:8080 by service
