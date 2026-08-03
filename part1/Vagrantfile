@@ -11,6 +11,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "libvirt" do |lv|
     lv.memory = 512
     lv.cpus = 1
+    lv.cpu_mode = "host_model"
   end
   
   config.vm.provision "shell", inline: <<-SHELL
