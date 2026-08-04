@@ -19,3 +19,18 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server \
   --flannel-iface=eth1 \
   --write-kubeconfig-mode=644 \
   --token=$K3S_TOKEN" sh -
+
+# Apply app and ingress
+echo "waiting server readiness"
+until nc -z -w 2 "$K3S_SERVER_IP" 6443 ; do 
+    echo "Server isnt set, delaying app launch";
+    sleep 5 ;
+
+echo "applying app one"
+kubectl apply -f /vagrant/app1.yaml
+echo "applying app two"
+kubectl apply -f /vagrant/app2.yaml
+echo "applying app three"
+kubectl apply -f /vagrant/app1.yaml
+echo "applying ingress"
+kubectl apply -f /vagrant/ingress.yaml
