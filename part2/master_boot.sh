@@ -25,6 +25,7 @@ echo "waiting server readiness"
 until nc -z -w 2 "$K3S_SERVER_IP" 6443 ; do 
     echo "Server isnt set, delaying app launch";
     sleep 5 ;
+done
 
 echo "applying app one"
 kubectl apply -f /vagrant/app1.yaml
