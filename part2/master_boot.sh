@@ -21,10 +21,11 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server \
   --token=$K3S_TOKEN" sh -
 
 # Apply app and ingress
-echo "waiting server readiness"
-until nc -z -w 2 "$K3S_SERVER_IP" 6443 ; do 
-    echo "Server isnt set, delaying app launch";
-    sleep 5 ;
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+echo "Waiting for Kubernetes API server readiness..."
+until kubectl cluster-info >/dev/null 2>&1; do
+    echo "K3s API server is not ready yet, waiting 5s..."
+    sleep 5
 done
 
 echo "applying app one"
