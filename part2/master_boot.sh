@@ -33,6 +33,6 @@ kubectl apply -f /vagrant/app1.yaml
 echo "applying app two"
 kubectl apply -f /vagrant/app2.yaml
 echo "applying app three"
-kubectl apply -f /vagrant/app1.yaml
+kubectl apply -f /vagrant/app3.yaml
 echo "applying ingress"
 kubectl apply -f /vagrant/ingress.yaml
