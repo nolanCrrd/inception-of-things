@@ -15,4 +15,4 @@ spec:
   syncPolicy:
     automated:
       prune: true #allow suppresion in cluster following git instruction
-      selfHeal: false # false for bughunt purpose, will be switched to true later
+      selfHeal: true # drift correction
