@@ -11,5 +11,6 @@ down:
 
 destroy: 
 	@vagrant destroy -f
+	@echo "\e[32mpart 2 successfully destroyed\e[0m"
 rerun:
 	@rm -rf .vagrant ; make
