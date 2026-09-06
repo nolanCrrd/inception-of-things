@@ -1,0 +1,14 @@
+# k3d-config.yaml
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: iot-phase3 
+servers: 1
+agents: 1
+ports:
+  - port: 8080:30080 #argo cd web cli
+    nodeFilters:
+      - agent:0
+  - port: 8081:30081 #will app
+    nodeFilters:
+      - agent:0
