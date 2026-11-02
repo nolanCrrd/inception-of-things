@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: iot-p3
+  name: iot-bonus
   namespace: argocd
 spec:
   project: default #can be seen as a security groups, using default profile
   source:
-    repoURL: 'https://github.com/ndelh/iotp3'
+    repoURL: 'http://gitlab.gitlab.svc.cluster.local/root/iot-app.git' # local gitlab, in-cluster url
     targetRevision: HEAD
     path: '.'
   destination:
-    server: 'https://kubernetes.default.svc' 
+    server: 'https://kubernetes.default.svc'
     namespace: dev
   syncPolicy:
     automated:
